@@ -1,0 +1,36 @@
+#!/bin/bash
+VOL=/dockervol/postgres
+MOUNT=/var/lib/pgsql
+NAME=postgresql
+IMAGE=postgres:13.2
+
+# functions
+## run container
+run-container() 
+{
+	docker run -dit \
+	-p 5432:5432 \
+	--add-host=ws:10.10.10.10 \
+	--add-host=db:10.10.10.11 \
+	-v $VOL:$MOUNT \
+	--restart=unless-stopped \
+	-e POSTGRES_PASSWORD=1 \
+	-e TZ=Asia/Kuala_Lumpur \
+	--name=$NAME \
+	--hostname=$NAME \
+	$IMAGE;
+}
+
+## stop, rename and run container
+ren-container()
+{
+	docker stop $NAME;
+	docker rename $NAME $NAME-backup-$(date +%Y%m%d%H%M);
+	run-container;
+}
+
+# checking if there is another container with container name
+if [[ $(docker ps --format='{{.Names}}' | grep -w $NAME) ]];
+	then ren-container;
+	else run-container;
+fi
