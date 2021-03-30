@@ -1,0 +1,37 @@
+#!/bin/bash
+VOL=/dockervol/tomcat
+MOUNT=/usr/local/tomcat
+NAME=tomcat
+IMAGE=tomcat:latest
+
+# functions
+## run container
+run-container() 
+{
+	docker run -dit \
+	-p 9090:9090 \
+	-p 443:8443 \
+	-p 80:8080 \
+	--add-host=ws:10.25.148.37 \
+	--add-host=db:10.25.148.35 \
+	-v $VOL:$MOUNT \
+	--restart=unless-stopped \
+	-e TZ=Asia/Kuala_Lumpur \
+	--name=$NAME \
+	--hostname=$NAME \
+	$IMAGE;
+}
+
+## stop, rename and run container
+ren-container()
+{
+	docker stop $NAME;
+	docker rename $NAME $NAME-backup-$(date +%Y%m%d%H%M);
+	run-container;
+}
+
+# checking if there is another container with container name
+if [[ $(docker ps --format='{{.Names}}' | grep -w $NAME) ]];
+	then ren-container;
+	else run-container;
+fi
