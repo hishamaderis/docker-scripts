@@ -1,0 +1,14 @@
+#!/bin/bash
+
+DAYS=30
+DIR=/backup
+
+# Deleting backup image files older than $DAYS
+find $DIR -type f -mtime +$DAYS -delete
+
+# Deleting backup directories older than $DAYS
+find $DIR -mindepth 1 -type d -mtime +$DAYS -delete
+
+# Deleting docker images older than 720hours/30days
+TODELETE=`docker images --format '{{.Repository}} {{.ID}} {{.CreatedSince}}' | grep backup | grep -Ei month\|year\|5\ weeks\|6\ weeks|\7\ weeks | awk '{print $2}'`
+docker rmi $TODELETE > /dev/null 2>&1
