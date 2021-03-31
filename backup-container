@@ -1,0 +1,17 @@
+#!/bin/bash
+BAKDIR=/backup
+# put a list of container to be backup, separated by single space
+CONTAINER='tomcat postgres'
+
+# create a backup images with timestamp 
+for CONTAINER in $CONTAINER
+        do docker commit $CONTAINER $CONTAINER-backup:`date +%Y%m%d` > /dev/null 2>&1
+done
+
+# get the names of backup images for today's date
+BAKIMAGES=`docker images --format '{{.Repository}}:{{.Tag}}' | grep $(date +%Y%m%d)`
+
+# dump the backup images to files
+for IMAGES in $BAKIMAGES
+        do docker save $IMAGES -o $BAKDIR/$IMAGES
+done
