@@ -1,0 +1,4 @@
+#!/bin/bash
+BAKDIR=/backup
+# create a backup with timestamp 
+cp -a /dockervol $BAKDIR/dockervol-`date +%Y%m%d`
