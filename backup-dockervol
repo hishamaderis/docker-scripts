@@ -2,4 +2,4 @@
 BAKDIR=/backup
 # create a backup with timestamp 
 #cp -a /dockervol $BAKDIR/dockervol-`date +%Y%m%d`
-tar cvjf $BAKDIR/dockervol-`date +%Y%m%d`.tar.bz2 /dockervol
+tar cjf $BAKDIR/dockervol-`date +%Y%m%d`.tar.bz2 /dockervol
