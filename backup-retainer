@@ -12,3 +12,31 @@ find $DIR -mindepth 1 -type d -mtime +$DAYS -delete
 # Deleting docker images older than 720hours/30days
 TODELETE=`docker images --format '{{.Repository}} {{.ID}} {{.CreatedSince}}' | grep backup | grep -Ei month\|year\|5\ weeks\|6\ weeks|\7\ weeks | awk '{print $2}'`
 docker rmi $TODELETE > /dev/null 2>&1
+
+
+##### used for maintaining backup files and docker images with uniform name #####
+#!/bin/bash
+
+DIR=/backup
+
+# Deleting backup image files older than $DAYS
+#find $DIR -type f -mtime +$DAYS -delete
+for i in {30..11}
+        do find $DIR -iname ef-db-active-backup:$(date +%Y%m%d -d "$i day ago") -delete
+done
+
+# Deleting backup directories older than $DAYS
+#find $DIR -mindepth 1 -type d -mtime +$DAYS -delete
+#for i in {40..16}; do find $DIR -type f -iname dockervol-$(date +%Y%m%d -d "$i day ago"); done
+#for i in {40..11}; do find $DIR -iname dockervol-$(date +%Y%m%d -d "$i day ago") -delete; done
+for i in {30..11}
+        do find $DIR -iname dockervol-$(date +%Y%m%d -d "$i day ago") -exec rm -rf '{}' \;
+done
+
+# Deleting docker images older than 720hours/30days
+#TODELETE=`docker images --format '{{.Repository}} {{.ID}} {{.CreatedSince}}' | grep backup | grep -Ei month\|year\|5\ weeks\|6\ weeks|\7\ weeks | awk '{print $2}'`
+#docker rmi $TODELETE > /dev/null 2>&1
+for i in {30..11}
+        do docker image rm ef-db-active-backup:$(date +%Y%m%d -d "$i day ago")
+done
+
